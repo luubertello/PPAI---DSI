@@ -1,0 +1,68 @@
+
+<div class="container mt-5">
+  <div class="card shadow-soft p-4 rounded-4">
+    
+    <h2 class="mb-4 fw-bold">Cerrar Orden de Inspección</h2>
+
+    <label for="observacion" class="form-label fw-semibold">Observación</label>
+    <textarea
+      id="observacion"
+      class="form-control mb-3"
+      rows="4"
+      [(ngModel)]="observacion"
+      placeholder="Escribí la observación aquí"
+    ></textarea>
+
+    <h5 class="fw-semibold mb-3">Agregar motivo</h5>
+
+    <div class="d-flex gap-2 flex-wrap mb-3">
+      <select
+        class="form-select flex-grow-1"
+        [(ngModel)]="nuevoMotivo"
+        aria-label="Seleccionar motivo"
+      >
+        <option value="" disabled selected>Seleccionar motivo</option>
+        <option *ngFor="let motivo of motivosDisponibles" [value]="motivo">
+          {{ motivo }}
+        </option>
+      </select>
+
+      <input
+        type="text"
+        class="form-control flex-grow-2"
+        placeholder="Comentario"
+        [(ngModel)]="comentarioNuevo"
+      />
+
+      <button class="btn btn-primary px-4" (click)="agregarMotivo()">
+        Agregar
+      </button>
+    </div>
+
+    <ul class="list-group mb-3">
+      <li
+        class="list-group-item d-flex justify-content-between align-items-center"
+        *ngFor="let m of motivosSeleccionados; let i = index"
+      >
+        <div>
+          <strong>{{ m.nombre }}</strong>: {{ m.comentario }}
+        </div>
+        <button
+          class="btn btn-sm btn-outline-danger"
+          (click)="eliminarMotivo(i)"
+          aria-label="Eliminar motivo"
+        >
+          <i class="bi bi-x-circle"></i>
+        </button>
+      </li>
+    </ul>
+
+    <button
+      class="btn btn-success w-100"
+      [disabled]="!observacion || motivosSeleccionados.length === 0"
+      (click)="confirmarCierre()"
+    >
+      Confirmar cierre
+    </button>
+  </div>
+</div>
