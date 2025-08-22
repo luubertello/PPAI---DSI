@@ -1,9 +1,9 @@
 // src/orden/orden-inspeccion.entity.ts
 
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { Estado } from './Estado';
+import { Estado } from '../Estado/estado.entity';
 import { EstacionSismologica } from './EstacionSismologica';
-import { Empleado } from './Empleado';
+import { Empleado } from '../Empleado/empleado.entity';
 
 @Entity('ordenInspeccion')
 export class OrdenInspeccion {

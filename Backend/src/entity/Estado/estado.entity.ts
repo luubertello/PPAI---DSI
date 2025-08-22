@@ -1,6 +1,6 @@
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { OrdenInspeccion } from './OrdenInspeccion';
-import { CambioEstado } from './CambioEstado';
+import { OrdenInspeccion } from '../OrdenInspeccion/OrdenInspeccion.entity';
+import { CambioEstado } from '../CambioEstado/cambioEstado.entity';
 @Entity('estado')
 export class Estado {
   @PrimaryGeneratedColumn()

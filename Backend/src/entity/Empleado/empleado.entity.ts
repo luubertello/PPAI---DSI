@@ -8,8 +8,8 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { Rol } from './Rol';
-import { OrdenInspeccion } from './OrdenInspeccion';
+import { Rol } from '../Rol';
+import { OrdenInspeccion } from '../OrdenInspeccion/OrdenInspeccion.entity';
 import { CambioEstado } from './CambioEstado';
 
 @Entity('empleado')

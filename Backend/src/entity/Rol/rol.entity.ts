@@ -1,7 +1,7 @@
 // src/rol/rol.entity.ts
 
 import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { Empleado } from './Empleado';
+import { Empleado } from './Empleado/Empleado.entity';
 
 @Entity('rol')
 export class Rol {

@@ -5,9 +5,9 @@ import {
   OneToMany,
 } from 'typeorm';
 import { CambioEstado } from './CambioEstado';
-import { Estado } from './Estado';
-import { MotivoTipo } from './MotivoTipo';
-import { Empleado } from './Empleado';
+import { Estado } from '../Estado/estado.entity';
+import { MotivoTipo } from '../MotivoTipo/motivoTipo.entity';
+import { Empleado } from '../Empleado/empleado.entity';
 import { EstacionSismologica } from './EstacionSismologica';
 
 
