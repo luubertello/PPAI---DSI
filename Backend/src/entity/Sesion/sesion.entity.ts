@@ -7,7 +7,7 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Usuario } from './Usuario';
+import { Usuario } from '../Usuario/usuario.entity';
 
 @Entity('sesion')
 export class Sesion {
@@ -15,29 +15,14 @@ export class Sesion {
   id: number;
 
   @Column({ type: 'timestamp' })
-  fechaHoraInicio: Date;
+  fechaHoraDesde: Date;
 
   @Column({ type: 'timestamp', nullable: true })
-  fechaHoraFin: Date | null;
+  fechaHoraHasta: Date | null;
 
+  // Relacion de Sesion a Usuario
   @ManyToOne(() => Usuario, { eager: true })
   @JoinColumn({ name: 'usuario_id' })
   usuario: Usuario;
 
-  constructor(
-    fechaHoraInicio?: Date,
-    fechaHoraFin?: Date | null,
-    usuario?: Usuario,
-  ) {
-    if (fechaHoraInicio) this.fechaHoraInicio = fechaHoraInicio;
-    if (fechaHoraFin) this.fechaHoraFin = fechaHoraFin;
-    if (usuario) this.usuario = usuario;
-  }
-
-  obtenerRILogueado(): Usuario | null {
-    if (!this.fechaHoraFin) {
-      return this.usuario;
-    }
-    return null;
-  }
 }

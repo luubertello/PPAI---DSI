@@ -1,6 +1,7 @@
 // src/usuario/usuario.entity.ts
 
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import { Empleado } from '../Empleado/empleado.entity';
 
 @Entity('usuario')
 export class Usuario {
@@ -13,26 +14,12 @@ export class Usuario {
   @Column({ type: 'varchar', length: 255 })
   contraseña: string;
 
-  constructor(contraseña?: string, nombreUsuario?: string) {
-    if (contraseña) this.contraseña = contraseña;
-    if (nombreUsuario) this.nombreUsuario = nombreUsuario;
-  }
+  @ManyToOne(() => Empleado, { eager: true })
+  @JoinColumn({ name: 'empleado_id' })
+  empleado: Empleado;
 
-  // Getters simulados (opcional en TS)
-  getNombreUsuario(): string {
-    return this.nombreUsuario;
-  }
-
-  getContraseña(): string {
-    return this.contraseña;
-  }
-
-  // Setters simulados (opcional en TS)
-  setNombreUsuario(nombreUsuario: string): void {
-    this.nombreUsuario = nombreUsuario;
-  }
-
-  setContraseña(contraseña: string): void {
-    this.contraseña = contraseña;
+  // Metodo para buscar empleado
+  getEmpleado() {
+    return this.empleado;
   }
 }
