@@ -1,4 +1,13 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class CambioEstadoService {}
+export class CambioEstadoService {
+
+    crearMotivoFueraDeServicio() {
+
+    }
+
+    new() {
+        
+    }
+}

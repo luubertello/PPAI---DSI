@@ -2,7 +2,7 @@
 
 import { Entity, Column, PrimaryGeneratedColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Estado } from '../Estado/estado.entity';
-import { EstacionSismologica } from './EstacionSismologica';
+import { EstacionSismologica } from '../EstacionSismologica/estacionSismologica.entity';
 import { Empleado } from '../Empleado/empleado.entity';
 
 @Entity('ordenInspeccion')
@@ -18,6 +18,9 @@ export class OrdenInspeccion {
 
   @Column({ type: 'timestamp', nullable: true })
   fechaHoraCierre: Date | null;
+
+  @Column()
+  numeroOrden: number;
 
   @Column({ type: 'text', nullable: true })
   observacionCierre: string;
@@ -36,7 +39,7 @@ export class OrdenInspeccion {
   @JoinColumn({ name: 'empleado_id' })
   empleado: Empleado;
   
-    //Metodos
+  // Metodos
   getFechaHoraFinalizacion(): Date | null {
   return this.fechaHoraFinalizacion;
   }
@@ -51,5 +54,5 @@ export class OrdenInspeccion {
 
   setFechaHoraCierre(fecha: Date): void {
     this.fechaHoraCierre = fecha;
-}
+  }
 }

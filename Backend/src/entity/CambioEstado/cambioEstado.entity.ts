@@ -34,8 +34,8 @@ export class CambioEstado {
   empleadoResponsable: Empleado;
 
   // Métodos propios
-  esActual(): boolean {
-    return this.fechaHoraFin === null;
+  esActual() {
+    
   }
 
   setFechaHoraFin(fecha: Date) {
