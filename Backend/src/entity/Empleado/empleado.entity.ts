@@ -8,9 +8,10 @@ import {
   OneToMany,
   JoinColumn,
 } from 'typeorm';
-import { Rol } from '../Rol';
+import { Rol } from '../Rol/rol.entity';
 import { OrdenInspeccion } from '../OrdenInspeccion/OrdenInspeccion.entity';
-import { CambioEstado } from './CambioEstado';
+import { CambioEstado } from '../CambioEstado/cambioEstado.entity';
+import { Usuario } from '../Usuario/usuario.entity';
 
 @Entity('empleado')
 export class Empleado {
@@ -41,8 +42,16 @@ export class Empleado {
   @OneToMany(() => CambioEstado, cambio => cambio.empleadoResponsable)
   cambiosDeEstado: CambioEstado[];
 
+  @OneToMany(() => Usuario, usuario => usuario.empleado)
+  usuarios: Usuario[];
 
- //Metodos
+
+ // Metodos
+
+ obtenerMail() {
+  return this.mail;
+ }
+ 
   esResponsableReparacion(): boolean {
     return this.rol?.esResponsableReparacion?.() ?? false;
   }
