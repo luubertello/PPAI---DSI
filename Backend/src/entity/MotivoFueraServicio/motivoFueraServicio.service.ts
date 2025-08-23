@@ -10,10 +10,10 @@ export class MotivoFueraServicioService {
     private readonly motivoFueraServicioRepo: Repository<MotivoFueraServicio>,
   ) {}
 
-async crearMotivoFueraServicio(comentario: string): Promise<MotivoFueraServicio> {
-  const motivo = this.motivoFueraServicioRepo.create({
-    comentario,
-  });
-  return await this.motivoFueraServicioRepo.save(motivo);
-}
+  async crearMotivoFueraServicio(comentario: string): Promise<MotivoFueraServicio> {
+    const motivo = this.motivoFueraServicioRepo.create({
+      comentario,
+    });
+    return await this.motivoFueraServicioRepo.save(motivo);
+  }
 }

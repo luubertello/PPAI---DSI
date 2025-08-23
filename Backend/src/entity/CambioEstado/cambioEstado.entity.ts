@@ -8,6 +8,7 @@ import {
 import { Estado } from '../Estado/estado.entity';
 import { Sismografo } from '../Sismografo/sismografo.entity';
 import { Empleado } from '../Empleado/empleado.entity';
+import { MotivoFueraServicio } from '../MotivoFueraServicio/motivoFueraServicio.entity';
 
 @Entity('cambio_estado')
 export class CambioEstado {
@@ -33,9 +34,12 @@ export class CambioEstado {
   @JoinColumn({ name: 'empleado_responsable_id' })
   empleadoResponsable: Empleado;
 
+  @ManyToOne(() => MotivoFueraServicio, { nullable: true })
+  motivoFueraServicio: MotivoFueraServicio;
+
   // Métodos propios
-  esActual() {
-    
+  esActual(): boolean {
+    return !this.fechaHoraFin;
   }
 
   setFechaHoraFin(fecha: Date) {
