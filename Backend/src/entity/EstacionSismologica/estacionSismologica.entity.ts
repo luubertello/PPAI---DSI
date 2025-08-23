@@ -8,8 +8,8 @@ import {
   ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { OrdenInspeccion } from './OrdenInspeccion';
-import { Sismografo } from './Sismografo';
+import { Sismografo } from '../Sismografo/sismografo.entity';
+import { OrdenInspeccion } from '../OrdenInspeccion/OrdenInspeccion.entity';
 
 @Entity('estacion_sismologica')
 export class EstacionSismologica {
@@ -46,5 +46,13 @@ export class EstacionSismologica {
   //Metodos
   getSismografo(): string {
     return this.sismografo?.identificadorSismografo ?? '';
+  }
+
+  getNombre() {
+    return this.nombre;
+  }
+
+  getCodigoEstacion() {
+    return this.codigoEstacion;
   }
 }

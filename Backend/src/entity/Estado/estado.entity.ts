@@ -1,38 +1,35 @@
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
-import { OrdenInspeccion } from '../OrdenInspeccion/OrdenInspeccion.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  OneToMany,
+} from 'typeorm';
 import { CambioEstado } from '../CambioEstado/cambioEstado.entity';
+
 @Entity('estado')
 export class Estado {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 50 })
-  ambito: string;
-
-  @Column({ type: 'varchar', length: 100 })
   nombreEstado: string;
 
-  @OneToMany(() => OrdenInspeccion, orden => orden.estado)
-  ordenes: OrdenInspeccion[];
+  @Column({ type: 'varchar', length: 50 })
+  ambito: string; // sismografo, 
 
-  @OneToMany(() => CambioEstado, cambio => cambio.estado)
-    cambiosDeEstado: CambioEstado[];
+  @OneToMany(() => CambioEstado, (cambio) => cambio.estado)
+  cambios: CambioEstado[];
 
-
-  constructor(ambito?: string, nombreEstado?: string) {
-    if (ambito) this.ambito = ambito;
-    if (nombreEstado) this.nombreEstado = nombreEstado;
-  }
-
-  esAmbitoOI(): boolean {
-    return this.ambito?.toLowerCase() === 'oi';
+  // Métodos
+  esAmbitoSismografo(): boolean {
+    return this.ambito.toLowerCase() === 'sismografo';
   }
 
   esCerrada(): boolean {
-    return this.nombreEstado?.toLowerCase() === 'cerrada';
+    return this.nombreEstado.toLowerCase() === 'cerrada';
   }
 
-  esCompRealizada(): boolean {
-    return this.nombreEstado?.toLowerCase() === 'completamenterealizada';
+  esFueraDeServicio(): boolean {
+    return this.nombreEstado.toLowerCase() === 'fuera de servicio';
   }
 }
