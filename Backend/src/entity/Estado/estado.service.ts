@@ -10,7 +10,7 @@ export class EstadoService {
     private readonly estadoRepo: Repository<Estado>,
   ) {}
 
-  // ✅ Crear un nuevo estado
+  // Crear un nuevo estado
   async crearEstado(nombreEstado: string, ambito: string): Promise<Estado> {
     const estado = this.estadoRepo.create({
       nombreEstado,

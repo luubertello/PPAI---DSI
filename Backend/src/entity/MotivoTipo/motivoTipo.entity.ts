@@ -1,6 +1,7 @@
 // src/motivo/motivo-tipo.entity.ts
 
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
+import { MotivoFueraServicio } from '../MotivoFueraServicio/motivoFueraServicio.entity';
 
 @Entity('motivo_tipo')
 export class MotivoTipo {
@@ -10,13 +11,10 @@ export class MotivoTipo {
   @Column({ type: 'varchar', length: 255 })
   descripcion: string;
 
-  constructor(descripcion?: string) {
-    if (descripcion) {
-      this.descripcion = descripcion;
-    }
-  }
+  @OneToMany(() => MotivoFueraServicio, (motivo) => motivo.tipo)
+  motivos: MotivoFueraServicio[];
 
-  //Metodos
+  // Metodos
 
   getDescripcion(): string {
     return this.descripcion;
