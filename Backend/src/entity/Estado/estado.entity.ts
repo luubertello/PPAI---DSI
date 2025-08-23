@@ -6,6 +6,7 @@ import {
 } from 'typeorm';
 import { CambioEstado } from '../CambioEstado/cambioEstado.entity';
 import { OrdenInspeccion } from '../OrdenInspeccion/OrdenInspeccion.entity';
+import { Sismografo } from '../Sismografo/sismografo.entity';
 
 @Entity('estado')
 export class Estado {
@@ -16,7 +17,7 @@ export class Estado {
   nombreEstado: string;
 
   @Column({ type: 'varchar', length: 50 })
-  ambito: string; // sismografo, 
+  ambito: string;
 
   @OneToMany(() => CambioEstado, (cambio) => cambio.estado)
   cambios: CambioEstado[];
@@ -24,9 +25,16 @@ export class Estado {
   @OneToMany(() => OrdenInspeccion, (orden) => orden.estado)
   ordenes: OrdenInspeccion[];
 
+  @OneToMany(() => Sismografo, (sismografo) => sismografo.estadoActual)
+  sismografo: Sismografo[];
+
   // Métodos
   esAmbitoSismografo(): boolean {
     return this.ambito.toLowerCase() === 'sismografo';
+  }
+
+  esAmbitoOrdenInspeccion(): boolean {
+    return this.ambito.toLowerCase() === 'orden de inspeccion';
   }
 
   esCerrada(): boolean {
@@ -35,5 +43,9 @@ export class Estado {
 
   esFueraDeServicio(): boolean {
     return this.nombreEstado.toLowerCase() === 'fuera de servicio';
+  }
+
+  esCompletamenteRealizada(): boolean {
+  return this.nombreEstado.toLowerCase() === 'completamente realizada';
   }
 }
