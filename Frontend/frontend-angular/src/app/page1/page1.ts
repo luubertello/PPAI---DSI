@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';  // para ngIf, pipes, etc.
-import { FormsModule } from '@angular/forms';    // para ngModel
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-page1',
@@ -10,13 +10,19 @@ import { FormsModule } from '@angular/forms';    // para ngModel
   templateUrl: './page1.html',
   styleUrls: ['./page1.css']
 })
-export class Page1 {
+export class Page1 implements OnInit {
   ordenesEmpleado: any[] = [];
   ordenSeleccionada: any = null;
 
   constructor(private router: Router) {}
 
-  buscarEmpleado() {
+  ngOnInit() {
+    // Se ejecuta automáticamente al cargar el componente
+    this.cargarOrdenes();
+  }
+
+  cargarOrdenes() {
+    // Aquí simulas la carga de órdenes
     this.ordenesEmpleado = [
       {
         id: 1,
