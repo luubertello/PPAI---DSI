@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, DataSource } from 'typeorm';
+
 import { OrdenInspeccion } from 'src/entity/OrdenInspeccion/OrdenInspeccion.entity';
 import { EstacionSismologica } from 'src/entity/EstacionSismologica/estacionSismologica.entity';
 import { Sismografo } from 'src/entity/Sismografo/sismografo.entity';
@@ -36,137 +37,212 @@ export class GestorCierreOIService {
     private readonly dataSource: DataSource,
   ) {}
 
-  //busca las ordenes completamente realizadas del empleado, a través de la sesión activa
-  async listarOrdenesCompletasDeRI(sesionId: number) {
-    //ordenes del RI
+  private sesionActual?: Sesion;
+  private empleadoResponsable: Empleado;
+  private ordenesDisponibles: OrdenInspeccion[] = [];
+  private ordenSeleccionada?: OrdenInspeccion;
+  private observacionCierre?: string;
+  private motivosSeleccionados: MotivoTipo[] = [];
+
+  //Método Buscar empleado logueado a través de sesión
+  async buscarEmpleadoLogueado(sesionId: number): Promise<Empleado> {
     const sesion = await this.sesionRepo.findOne({
       where: { id: sesionId },
       relations: ['usuario', 'usuario.empleado'],
     });
     const empleado = sesion?.usuario?.empleado;
-    if (!empleado) {
+    if (!empleado)
       throw new NotFoundException('Usuario/empleado no encontrado');
-    }
+    this.sesionActual = sesion;
+    this.empleadoResponsable = empleado;
+    return empleado;
+  }
 
-    //ordenes completamente realizadas del RI
+  //Método Buscar OI CR
+  async buscarOrdenInspCompletamenteRealizadas(
+    sesionId: number,
+  ): Promise<OrdenInspeccion[]> {
+    const empleado = await this.buscarEmpleadoLogueado(sesionId);
     const ordenes = await this.oiRepo.find({
       where: {
-        empleado: { id: sesion.usuario.empleado.id },
-        estado: 'COMPLETAMENTE_REALIZADA',
+        empleado: { id: empleado.id },
+        estado: 'COMPLETAMENTE_REALIZADA' as any,
       },
       relations: ['estacion', 'estacion.sismografo'],
-      order: { fechaHoraFinalizacion: 'DESC' },
+      //ordena por fecha de finalización
+      order: { fechaHoraFinalizacion: 'DESC' as any },
     });
-
-    //Alternativa 1: el RI NO tiene OI
-    if (!ordenes.length) {
-      throw new NotFoundException(
-        'A1: El RI no tiene órdenes de inspección completamente realizadas',
-      );
-    }
-
+    this.ordenesDisponibles = ordenes;
     return ordenes;
   }
 
-  async cerrarOrden(dto: CerrarOIDto) {
-    //la observación debe estar (corresponde al paso 10)
-    if (!dto.observacionCierre?.trim()) {
-      throw new BadRequestException('La observación de cierre es obligatoria');
-    }
-
-    const sesion = await this.sesionRepo.findOne({
-      where: { id: dto.sesionId },
-      relations: ['usuario', 'usuario.empleado'],
+  //Método tomar seleccion de orden
+  async tomarSeleccionOrden(idOrden: number): Promise<OrdenInspeccion> {
+    const oi = await this.oiRepo.findOne({
+      where: { id: idOrden },
+      relations: ['estacion', 'estacion.sismografo', 'responsable'],
     });
-    const empleado = sesion?.usuario?.empleado;
-    if (!empleado)
-      throw new NotFoundException('Usuario/empleado no encontrado');
-
-    const orden = await this.oiRepo.findOne({
-      where: { id: dto.ordenId },
-      relations: ['estacion', 'estacion.sismografo'],
-    });
-    if (!orden)
-      throw new NotFoundException('Orden de inspección no encontrada');
-
-    //validación de estado previo
-    if (orden.estado !== 'COMPLETAMENTE_REALIZADA') {
+    if (!oi) throw new NotFoundException('Orden de inspección inexistente.');
+    if (oi.estado !== ('COMPLETAMENTE_ REALIZADA' as any)) {
       throw new BadRequestException(
-        'La OI debe estar completamente realizada para su cierre.',
+        'La Orden de Inspección debe estar COMPLETAMENTE_REALIZADA para cerrarla',
       );
     }
+    this.ordenSeleccionada = oi;
+    return oi;
+  }
 
-    //si la acción es FS, deben venir al menos 1 motivo (paso 6-7 y validación paso 10)
-    if (dto.accionSismografo === 'FUERA_SERVICIO') {
-      if (!dto.motivosFS?.length) {
+  //Método tomar observación de cierre y es necesario que la observación esté (validarExistenciaObservacion())
+  tomarObservacionCierre(texto: string): void {
+    if (!texto || !texto.trim()) {
+      throw new BadRequestException('La observación de cierre es obligatoria');
+    }
+    this.observacionCierre = texto.trim();
+  }
+
+  //Método habilitar actualización del estado del sismógrafo
+  async habilitarActualizacionSituacionSismografo(): Promise<{
+    motivos: MotivoTipo[];
+  }> {
+    const motivos = await this.motivoTipoRepo.find();
+    return { motivos };
+  }
+
+  //Método buscar motivo tipo
+  async buscarMotivoTipo(): Promise<MotivoTipo[]> {
+    return this.motivoTipoRepo.find();
+  }
+
+  //Método tomar selección de motivo(s)
+  tomarSeleccionMotivo(motivos: MotivoTipo[]): void {
+    this.motivosSeleccionados =
+      motivos?.map((m) => ({
+        id: Number(m.id),
+        //tomarComentario()
+        descripcion: (m.descripcion ?? '').trim(),
+      })) ?? [];
+  }
+
+  //Método tomar confirmación de cierre
+  tomarConfrimacionCierre(): void {
+    return;
+  }
+  //**************************************************************************************************************************** */
+  // *******************************DE ACÁ EN ADELANTE ME CANSÉ Y COPIÉ Y PEGUÉ, HAY QUE VERLO BIEN!!  *****************************
+  //****************************************************************************************************************************** */
+
+  //Método para validar cantidad mínima de motivos
+  private validarMotivosSeleccMinimo(decision: DecisionCierre, motivos: MotivoTipo[] | undefined) {
+    if (decision === DecisionCierre.FUERA_SERVICIO) {
+      if (!motivos?.length) {
+        // Alternativa 3: faltan datos requeridos para FS
         throw new BadRequestException(
           'Debe seleccionar al menos un motivo de Fuera de Servicio',
         );
       }
     }
+  }
 
-    return this.dataSource.transaction(async (trx) => {
-      // cerrar OI (paso 11)
-      orden.estado = 'CERRADA';
-      orden.observacionCierre = dto.observacionCierre.trim();
-      orden.fechaHoraCierre = new Date();
-      await trx.getRepository(OrdenInspeccion).save(orden);
+  //Método del cierre de la OI
+  async cerrarOrdenInspeccion(params: {
+    idOrden: number;
+    sesionId: number;
+    decision: DecisionCierre; // ONLINE (Alternativa 2) o FUERA_SERVICIO
+    motivosFS?: MotivoTipo[]; // requerido si FS
+    observacion: string; // obligatorio
+  }): Promise<{ ok: true; ordenId: number; nuevoEstadoSismografo: string }> {
+    const { idOrden, sesionId, decision, motivosFS, observacion } = params;
 
-      //actualizar estado del sismógrafo (paso 12 y Alterativa 2)
-      const sismografo = await trx.getRepository(Sismografo).findOne({
-        where: { id: orden.estacionSismologica.sismografo.id },
+    //validaciones previas (A3)
+    this.tomarObservacionCierre(observacion);
+    this.validarMotivosSeleccMinimo(decision, motivosFS);
+
+    return this.ds.transaction(async (trx) => {
+      // Sesión -> Usuario -> Empleado (RI)
+      const sesion = await trx.getRepository(Sesion).findOne({
+        where: { id: sesionId },
+        relations: ['usuario', 'usuario.empleado'],
+      });
+      const ri = sesion?.usuario?.empleado;
+      if (!ri) throw new NotFoundException('Sesión/usuario/empleado no encontrado');
+
+      // OI seleccionada (debe estar COMPLETAMENTE_REALIZADA)
+      const oi = await trx.getRepository(OrdenInspeccion).findOne({
+        where: { id: idOrden },
+        relations: ['estacion', 'estacion.sismografo', 'responsable'],
+      });
+      if (!oi) throw new NotFoundException('Orden de inspección inexistente');
+      if (oi.estado !== ('COMPLETAMENTE_REALIZADA' as any)) {
+        throw new BadRequestException('La OI no está COMPLETAMENTE_REALIZADA');
+      }
+
+      // Cerrar la OI
+      oi.estado = 'CERRADA' as any;
+      oi.observacionCierre = this.observacionCierre!;
+      (oi as any).fechaCierre = new Date(); // ajusta si tu entidad ya tiene este campo
+      await trx.getRepository(OrdenInspeccion).save(oi);
+
+      // Estado destino del sismógrafo según decisión (A2 = ONLINE por defecto)
+      const estadoDestinoNombre =
+        decision === DecisionCierre.FUERA_SERVICIO ? 'FUERA_DE_SERVICIO' : 'ONLINE';
+      const estadoDestino = await trx.getRepository(Estado).findOne({
+        where: { nombre: estadoDestinoNombre },
+      });
+      if (!estadoDestino) throw new NotFoundException(`Estado ${estadoDestinoNombre} no parametrizado`);
+
+      // Sismógrafo de la estación
+      const sism = await trx.getRepository(Sismografo).findOne({
+        where: { id: oi.estacion.sismografo.id },
         relations: ['estadoActual'],
       });
-      if (!sismografo) throw new NotFoundException('Sismógrafo no encontrado');
+      if (!sism) throw new NotFoundException('Sismógrafo no encontrado');
 
-      const nombreEstado =
-        dto.accionSismografo === 'FUERA_SERVICIO'
-          ? 'FUERA_SERVICIO'
-          : 'EN_LINEA';
-      const estadoNuevo = await trx
-        .getRepository(Estado)
-        .findOne({ where: { nombreEstado: nombreEstado } });
-      if (!estadoNuevo)
-        throw new NotFoundException(`Estado ${nombreEstado} no parametrizado`);
-
-      // cambio de estado + trazabilidad (RN 7 + paso 12 + Observación 2)
-      const cambio = trx.getRepository(CambioEstado).create({
-        sismografo,
-        estado: estadoNuevo,
+      // Cerrar cambio actual (si tu modelo lo requiere) y crear nuevo cambio
+      const nuevoCambio = trx.getRepository(CambioEstado).create({
+        sismografo: sism,
+        estado: estadoDestino,
         fechaHora: new Date(),
-        empleadoResponsable: empleado, // RI logueado
-        observacion: dto.observacionCierre,
+        responsable: ri,
+        observacion: this.observacionCierre!,
       });
-      await trx.getRepository(CambioEstado).save(cambio);
+      await trx.getRepository(CambioEstado).save(nuevoCambio);
 
-      // 2.a) Asociar motivos si FS (pasos 6-7-12)
-      if (dto.accionSismografo === 'FUERA_SERVICIO') {
-        for (const m of dto.motivosFS!) {
-          const tipo = await trx.getRepository(MotivoTipo).findOne({ where: { id: m.motivoTipoId } });
-          if (!tipo)
-            throw new NotFoundException(
-              `MotivoTipo ${m.motivoTipoId} inexistente`,
-            );
+      // Si es FS: persistir motivos seleccionados (0..*)
+      if (decision === DecisionCierre.FUERA_SERVICIO) {
+        for (const m of (motivosFS ?? [])) {
+          const tipo = await trx.getRepository(MotivoTipo).findOne({
+            where: { id: m.motivoTipoId },
+          });
+          if (!tipo) throw new NotFoundException(`MotivoTipo ${m.motivoTipoId} no encontrado`);
+
           const mfs = trx.getRepository(MotivoFueraServicio).create({
-            cambioEstado: cambio,
+            cambioEstado: nuevoCambio,
             motivoTipo: tipo,
-            comentario: m.comentario?.trim(),
+            comentario: m.comentario,
           });
           await trx.getRepository(MotivoFueraServicio).save(mfs);
         }
       }
 
-      //actualizar estado actual del sismógrafo
-      sismografo.estadoActual = estadoNuevo;
-      await trx.getRepository(Sismografo).save(sismografo);
+      // Actualizar estado actual del sismógrafo (si lo llevás denormalizado)
+      (sism as any).estadoActual = estadoDestino;
+      await trx.getRepository(Sismografo).save(sism);
 
-      //Respuesta
-      return {
-        ok: true,
-        ordenId: orden.id,
-        sismografoId: sismografo.id,
-        estadoSismografo: nombreEstado,
-      };
+      // Notificaciones (placeholders por trazabilidad)
+      await this.enviarMail(oi, sism, estadoDestinoNombre, ri);
+      await this.mostrarEnMonitor(oi, sism, estadoDestinoNombre);
+
+      return { ok: true, ordenId: oi.id, nuevoEstadoSismografo: estadoDestinoNombre };
     });
+  }
+
+  //Método fin caso de uso
+  finCU(): void {
+    this.sesionActual = undefined;
+    this.empleadoResponsable = undefined;
+    this.ordenesDisponibles = [];
+    this.ordenSeleccionada = undefined;
+    this.observacionCierre = undefined;
+    this.motivosSeleccionados = [];
   }
 }
