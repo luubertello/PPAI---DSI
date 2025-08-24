@@ -9,7 +9,8 @@ export class SesionService {
     @InjectRepository(Sesion)
     private sesionRepo: Repository<Sesion>,
   ) {}
-
+      
+    //Metodo buscarEmpleadoLogueado
     async buscarEmpleadoLogueado(sesionId: number) {
         const sesion = await this.sesionRepo.findOne({
         where: { id: sesionId },
