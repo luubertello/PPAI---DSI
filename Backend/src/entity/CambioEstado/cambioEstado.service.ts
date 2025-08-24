@@ -16,7 +16,7 @@ export class CambioEstadoService {
     @InjectRepository(MotivoFueraServicio)
     private motivoFueraServicioRepo: Repository<MotivoFueraServicio>,
   ) {}
-
+  //Metodo crearCambioEstado
   async crearCambioEstado(
       sismografo: Sismografo,
       estado: Estado,
@@ -46,7 +46,7 @@ export class CambioEstadoService {
       return this.cambioEstadoRepo.save(nuevoCambio);
     }
 
-
+     //Metodo crearMotivoFueraServicio
     async crearMotivoFueraServicio(
         cambioEstado: CambioEstado,
         comentario: string,
