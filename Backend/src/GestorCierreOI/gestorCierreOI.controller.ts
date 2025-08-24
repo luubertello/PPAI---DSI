@@ -15,4 +15,3 @@ export class GestorCierreOIController {
     return this.gestorService.cerrarOrden(+idOrden, +idEmpleado, dto);
   }
 }
-

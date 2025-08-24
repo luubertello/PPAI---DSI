@@ -1,9 +1,9 @@
 // src/gestor-cierre-oi/dto/cerrar-orden.dto.ts
-import { IsInt, IsNotEmpty, IsArray, ArrayNotEmpty, ValidateNested, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, IsArray, ValidateNested } from 'class-validator';
 import { Type } from 'class-transformer';
 
-class MotivoCierreDto {
-  @IsInt()
+export class MotivoCierreDto {
+  @IsNotEmpty()
   motivoTipoId: number;
 
   @IsString()
@@ -16,8 +16,8 @@ export class CerrarOrdenDto {
   observacionCierre: string;
 
   @IsArray()
-  @ArrayNotEmpty()
   @ValidateNested({ each: true })
   @Type(() => MotivoCierreDto)
   motivos: MotivoCierreDto[];
 }
+
