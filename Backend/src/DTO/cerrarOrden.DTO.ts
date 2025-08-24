@@ -1,23 +1,17 @@
 // src/gestor-cierre-oi/dto/cerrar-orden.dto.ts
-import { IsNotEmpty, IsString, IsArray, ValidateNested } from 'class-validator';
-import { Type } from 'class-transformer';
+export class ListarOrdenesCompletasQuery {
+  sesionId!: string; // id de Sesion
+}
 
 export class MotivoCierreDto {
-  @IsNotEmpty()
-  motivoTipoId: number;
-
-  @IsString()
-  comentario: string;
+  motivoTipoId!: string;
+  comentario!: string;
 }
 
-export class CerrarOrdenDto {
-  @IsNotEmpty()
-  @IsString()
-  observacionCierre: string;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => MotivoCierreDto)
-  motivos: MotivoCierreDto[];
+export class CerrarOIDto {
+  ordenId!: string;
+  sesionId!: string; // para obtener al Empleado (RI)
+  observacionCierre!: string;
+  accionSismografo!: 'FUERA_SERVICIO' | 'EN_LINEA';
+  motivosFS?: MotivoCierreDto[];
 }
-
