@@ -9,7 +9,8 @@ export class MotivoFueraServicioService {
     @InjectRepository(MotivoFueraServicio)
     private readonly motivoFueraServicioRepo: Repository<MotivoFueraServicio>,
   ) {}
-
+  
+  //Metodo crearMotivoFueraServicio
   async crearMotivoFueraServicio(comentario: string): Promise<MotivoFueraServicio> {
     const motivo = this.motivoFueraServicioRepo.create({
       comentario,
