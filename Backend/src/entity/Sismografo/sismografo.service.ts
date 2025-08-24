@@ -70,6 +70,7 @@ async enviarAReparar(sismografoId: number): Promise<void> {
   await this.cambioEstadoService.crearCambioEstado(sismografo, estadoFueraServicio);
 }
 
+  //Metodo solicitarCertificacion
   async solicitarCertificacion(sismografoId: number): Promise<void> {
     // Logica
   }
