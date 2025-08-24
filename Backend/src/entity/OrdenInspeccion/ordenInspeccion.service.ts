@@ -20,7 +20,7 @@ export class OrdenInspeccionService {
 
   // Cerrar una orden de inspección
   async cerrarOrden(id: number): Promise<OrdenInspeccion> {
-    // 1. Buscar la orden
+    // Buscar la orden
     const orden = await this.ordenRepo.findOne({
       where: { numeroOrden: id },
       relations: ['estado'],
@@ -41,11 +41,11 @@ if (!estadoCerrada) {
   throw new NotFoundException(`Estado 'CERRADA' no encontrado`);
 }
 
-// 3. Setear valores usando tus métodos de la entidad
+// Setear valores usando tus métodos de la entidad
 orden.setEstado(estadoCerrada);
 orden.setFechaHoraCierre(new Date());
 
-// 4. Guardar y devolver
+// Guardar y devolver
 return await this.ordenRepo.save(orden);
   }
 
