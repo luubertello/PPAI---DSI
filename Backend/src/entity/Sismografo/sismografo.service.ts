@@ -21,6 +21,7 @@ export class SismografoService {
   private readonly cambioEstadoService: CambioEstadoService
   ) {}
 
+//Metodo buscarUltimoCambioEstado
 async buscarUltimoCambioEstado(sismografoId: number): Promise<CambioEstado | null> {
   const sismografo = await this.sismografoRepo.findOne({
     where: { id: sismografoId },
