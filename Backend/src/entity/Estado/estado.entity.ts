@@ -1,9 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  OneToMany,
-} from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from 'typeorm';
 import { CambioEstado } from '../CambioEstado/cambioEstado.entity';
 import { OrdenInspeccion } from '../OrdenInspeccion/OrdenInspeccion.entity';
 import { Sismografo } from '../Sismografo/sismografo.entity';
@@ -46,6 +41,6 @@ export class Estado {
   }
 
   esCompletamenteRealizada(): boolean {
-  return this.nombreEstado.toLowerCase() === 'completamente realizada';
+    return this.nombreEstado.toLowerCase() === 'completamente realizada';
   }
 }

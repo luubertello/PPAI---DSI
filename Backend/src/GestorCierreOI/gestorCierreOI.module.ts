@@ -13,6 +13,7 @@ import { MotivoTipo } from '../entity/MotivoTipo/motivoTipo.entity';
 import { MotivoFueraServicio } from 'src/entity/MotivoFueraServicio/motivoFueraServicio.entity';
 import { Empleado } from '../entity/Empleado/empleado.entity';
 import { Sesion } from 'src/entity/Sesion/sesion.entity';
+import { Usuario } from 'src/entity/Usuario/usuario.entity';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Sesion } from 'src/entity/Sesion/sesion.entity';
       MotivoFueraServicio,
       Empleado,
       Sesion,
+      Usuario,
     ]),
   ],
   controllers: [GestorCierreOIController],

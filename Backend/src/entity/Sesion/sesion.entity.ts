@@ -24,5 +24,4 @@ export class Sesion {
   @ManyToOne(() => Usuario, { eager: true })
   @JoinColumn({ name: 'usuario_id' })
   usuario: Usuario;
-
 }

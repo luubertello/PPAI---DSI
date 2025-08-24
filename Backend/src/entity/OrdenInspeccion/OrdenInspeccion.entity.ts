@@ -38,10 +38,10 @@ export class OrdenInspeccion {
   @ManyToOne(() => Empleado, empleado => empleado.ordenes)
   @JoinColumn({ name: 'empleado_id' })
   empleado: Empleado;
-  
+
   // Metodos
   getFechaHoraFinalizacion(): Date | null {
-  return this.fechaHoraFinalizacion;
+    return this.fechaHoraFinalizacion;
   }
 
   getNumeroOrden(): number {
